@@ -1,0 +1,51 @@
+﻿@{
+}
+
+@model IndexViewModel
+
+<!--Heading with team name-->
+<div class="jumbotron">
+    <h1>Roster</h1>
+    <p>Team: @(Model.TeamName == null ? "All Teams" : Model.TeamName)</p>
+</div>
+
+<!--Table containing bowler contact info-->
+<table class="table table-sm table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Last Name</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Middile Initial</th>
+            <th scope="col">Address</th>
+            <th scope="col">City</th>
+            <th scope="col">State</th>
+            <th scope="col">Zip</th>
+            <th scope="col">Phone Number</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var bowler in Model.Bowlers)
+        {
+            <tr>
+                <td>@bowler.BowlerLastName</td>
+                <td>@bowler.BowlerFirstName</td>
+                <td>@bowler.BowlerMiddleInit</td>
+                <td>@bowler.BowlerAddress</td>
+                <td>@bowler.BowlerCity</td>
+                <td>@bowler.BowlerState</td>
+                <td>@bowler.BowlerZip</td>
+                <td>@bowler.BowlerPhoneNumber</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!--Pagination-->
+<div page-info="@Model.PageNumberingInfo" page-url-teamname="@Model.TeamName" page-classes-enabled="true" page-class="btn"
+     page-class-selected="btn-primary" page-class-normal="btn-outline-dark" page-class-disabled="btn-outline-dark disabled" class="btn-group pull-right m-1">
+</div>
+
+<div>
+    <p>@Model.PageNumberingInfo.NumItemsPerPage items per page.</p>
+</div>

@@ -1,0 +1,24 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model IEnumerable<Team>
+
+<!--This page is used to generate the buttons for selecting a category-->
+<ul style="list-style: none">
+    <li style="padding: 1px">
+        <a class="btn btn-sm btn-block btn-outline-secondary" asp-action="Index" asp-controller="Home" asp-route-teamid="">Home</a>
+    </li>
+
+    @foreach (var team in Model)
+    {
+        <li style="padding: 1px">
+            <a class="btn btn-sm btn-block @(team.TeamName == ViewBag.SelectedType ? "btn-primary" : "btn-outline-secondary")"
+               asp-action="Index" asp-controller="Home" asp-route-teamid="@team.TeamId"
+               asp-route-teamname="@team.TeamName">@team.TeamName
+            </a>
+        </li>
+    }
+</ul>
