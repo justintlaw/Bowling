@@ -4,7 +4,7 @@
 @{
 }
 
-@model IEnumerable<Team>
+@model CategoryViewModel
 
 <!--This page is used to generate the buttons for selecting a category-->
 <ul style="list-style: none">
@@ -12,13 +12,22 @@
         <a class="btn btn-sm btn-block btn-outline-secondary" asp-action="Index" asp-controller="Home" asp-route-teamid="">Home</a>
     </li>
 
-    @foreach (var team in Model)
+    @foreach (Team team in Model.Teams)
     {
         <li style="padding: 1px">
-            <a class="btn btn-sm btn-block @(team.TeamName == ViewBag.SelectedType ? "btn-primary" : "btn-outline-secondary")"
-               asp-action="Index" asp-controller="Home" asp-route-teamid="@team.TeamId"
-               asp-route-teamname="@team.TeamName">@team.TeamName
-            </a>
+            <form method="post" asp-controller="Home" asp-action="Category">
+                <input id="teamId" name="teamId" value="@team.TeamId" readonly hidden />
+                <input id="teamName" name="teamName" value="@team.TeamName" readonly hidden />
+                <button class="btn btn-sm btn-block @(Model.SelectedTeamIds.Contains(team.TeamId) ? "btn-primary" : "btn-outline-secondary")"
+                        type="submit">
+                    @team.TeamName
+                </button>
+                @*<button class="btn btn-sm btn-block @(team.TeamName == ViewBag.SelectedType ? "btn-primary" : "btn-outline-secondary")"
+                asp-action="Index" asp-controller="Home" asp-route-teamid="@team.TeamId"
+                asp-route-teamname="@team.TeamName">
+            @team.TeamName
+        </button>*@
+            </form>
         </li>
     }
 </ul>

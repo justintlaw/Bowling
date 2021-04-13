@@ -1,4 +1,5 @@
-﻿using Bowling.Models;
+﻿using Bowling.Infrastructure;
+using Bowling.Models;
 using Bowling.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -21,27 +22,81 @@ namespace Bowling.Controllers
             _context = context;
         }
 
-        public IActionResult Index(int? teamId, string teamName, int pageNum = 1)
+        [HttpPost]
+        public IActionResult Category(int teamId)
+        {
+            
+            Categories categories = HttpContext.Session.GetJson<Categories>("Categories") ?? new Categories();
+            List<long> categoryIds = categories.SelectedTeamIds;
+
+            if (categoryIds.Contains(teamId))
+            {
+                categories.RemoveCategory(teamId);
+            }
+
+            else
+            {
+                categories.AddCategory(teamId);
+            }
+
+            HttpContext.Session.SetJson("Categories", categories);
+
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult Index(int pageNum = 1)
         {
             // set the number of items for pagination
             const int pageSize = 5;
 
+            //IQueryable<Bowler> query = _context.Bowlers;
+
+            //if (teamId is not null && !_selectedTeamIds.Contains(teamId.Value))
+            //{
+            //    _selectedTeamIds.Add(teamId.Value);
+            //}
+
+            //if (teamId is not null)
+            //{
+
+            //    //IQueryable<Bowler> query = _context.Bowlers
+            //    //    .Where(bowler => bowler.TeamId == teamId || teamId == null);
+
+            //    query = _context.Bowlers
+            //        .Where(b => _selectedTeamIds.Contains(b.TeamId.Value));
+            //}
+
             // set the title of the page to the team tame if included
-            if (teamId is not null)
+            if (false)
             {
-                ViewData["Title"] = $"{teamName}";
+                //ViewData["Title"] = $"{teamName}";
             }
             else
             {
                 ViewData["Title"] = $"All";
             }
 
+            IQueryable<Bowler> query = _context.Bowlers;
+            Categories categories = HttpContext.Session.GetJson<Categories>("Categories") ?? new Categories();
+            List<long> categoryIds = categories.SelectedTeamIds;
+
+            if (categoryIds.Count() > 0)
+            {
+                query = query.Where(b => categoryIds.Contains(b.TeamId.Value));
+            }
+
             // Return a view containing a list of bowlers and the page numbering info
             return View(new IndexViewModel
             {
                 // Get bowlers for a certain team, or all teams if teamId is null
-                Bowlers = (_context.Bowlers
-                    .Where(bowler => bowler.TeamId == teamId || teamId == null)
+                //Bowlers = (_context.Bowlers
+                //    .Where(bowler => bowler.TeamId == teamId || teamId == null)
+                //    .OrderBy(bowler => bowler.BowlerLastName)
+                //    .ThenBy(bowler => bowler.BowlerFirstName)
+                //    .Skip((pageNum - 1) * pageSize)
+                //    .Take(pageSize)
+                //    .ToList()),
+                Bowlers = (query
                     .OrderBy(bowler => bowler.BowlerLastName)
                     .ThenBy(bowler => bowler.BowlerFirstName)
                     .Skip((pageNum - 1) * pageSize)
@@ -52,10 +107,11 @@ namespace Bowling.Controllers
                 {
                     NumItemsPerPage = pageSize,
                     CurrentPage = pageNum,
-                    TotalNumItems = teamId == null ? _context.Bowlers.Count() :
-                        _context.Bowlers.Where(bowler => bowler.TeamId == teamId).Count()
+                    //TotalNumItems = teamId == null ? _context.Bowlers.Count() :
+                    //    _context.Bowlers.Where(bowler => bowler.TeamId == teamId).Count()
+                    TotalNumItems = query.Count()
                 },
-                TeamName = teamName
+                TeamName = null
             });
         }
 

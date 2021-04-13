@@ -1,6 +1,7 @@
 using Bowling.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +33,11 @@ namespace Bowling
            {
                options.UseSqlite(Configuration["ConnectionStrings:BowlingContextDbConnection"]);
            });
+
+            services.AddDistributedMemoryCache();
+            services.AddSession();
+            services.AddScoped<Categories>(cat => Categories.GetCategories(cat));
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,23 +56,25 @@ namespace Bowling
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            app.UseSession();
+
             app.UseRouting();
 
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute("teamnamepagenum",
-                    "TeamName/{teamid}/{teamname}/{pagenum}",
-                    new { Controller = "Home", action = "Index" });
+                //endpoints.MapControllerRoute("teamnamepagenum",
+                //    "TeamName/{teamid}/{teamname}/{pagenum}",
+                //    new { Controller = "Home", action = "Index" });
 
-                endpoints.MapControllerRoute("teamid",
-                    "TeamName/{teamid}/{teamname}",
-                    new { Controller = "Home", action = "Index" });
+                //endpoints.MapControllerRoute("teamid",
+                //    "TeamName/{teamid}/{teamname}",
+                //    new { Controller = "Home", action = "Index" });
 
-                endpoints.MapControllerRoute("pagenum",
-                    "All/{pagenum}",
-                    new { Controller = "Home", action = "Index" });
+                //endpoints.MapControllerRoute("pagenum",
+                //    "All/{pagenum}",
+                //    new { Controller = "Home", action = "Index" });
 
                 endpoints.MapControllerRoute(
                     name: "default",
